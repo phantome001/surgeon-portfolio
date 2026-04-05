@@ -1,0 +1,26 @@
+{
+  "name": "د. غنوش زين الدين — جراح اختصاصي",
+  "short_name": "Dr. Ganouche",
+  "description": "الموقع الرسمي للدكتور غنوش زين الدين — جراح اختصاصي في أمراض الجهاز الهضمي",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0a0f1c",
+  "theme_color": "#c8a45a",
+  "orientation": "portrait",
+  "lang": "ar",
+  "dir": "rtl",
+  "icons": [
+    {
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
