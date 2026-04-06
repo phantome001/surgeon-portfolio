@@ -26,7 +26,6 @@ interface Appointment {
 }
 
 export default function AdminDashboard() {
-  const router = useRouter()
   const [tab, setTab] = useState<Tab>('appointments')
   const [appointments, setAppointments] = useState<Appointment[]>([])
   const [loading, setLoading] = useState(true)
