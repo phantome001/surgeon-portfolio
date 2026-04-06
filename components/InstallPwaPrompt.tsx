@@ -24,10 +24,11 @@ export function InstallPwaPrompt() {
     const isIosDevice = /iphone|ipad|ipod/.test(userAgent);
     setIsIOS(isIosDevice);
 
-    // If it's iOS and not standalone, show prompt after a short delay
-    if (isIosDevice) {
-      setTimeout(() => setShowPrompt(true), 3000)
-    }
+    // Show prompt after a short delay if it hasn't been triggered natively
+    // This helps in environments where beforeinstallprompt doesn't fire (like HTTP over LAN)
+    const timeoutId = setTimeout(() => {
+      setShowPrompt(true)
+    }, 3000)
 
     // Capture the beforeinstallprompt event for Android/Chrome Desktop
     const handleBeforeInstallPrompt = (e: any) => {
@@ -42,12 +43,17 @@ export function InstallPwaPrompt() {
     window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt)
 
     return () => {
+      clearTimeout(timeoutId)
       window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt)
     }
   }, [])
 
   const handleInstallClick = async () => {
-    if (!deferredPrompt) return
+    if (!deferredPrompt) {
+      // Fallback if beforeinstallprompt was blocked by browser (e.g. HTTP LAN dev)
+      alert('بسبب تصفحك للنسخة التجريبية (الشبكة المحلية)، يرجى التثبيت يدوياً:\n\n1. اضغط على القائمة (⋮) أعلى المتصفح.\n2. اختر "إضافة إلى الشاشة الرئيسية".\n\n(هذه الخطوة ستصبح ضغطة زر واحدة بعد رفع التطبيق على الإنترنت).')
+      return
+    }
 
     // Show the native install prompt
     deferredPrompt.prompt()
