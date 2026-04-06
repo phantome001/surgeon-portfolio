@@ -1,4 +1,4 @@
-﻿'use client'
+'use client'
 
 import { useEffect, useState } from 'react'
 import { Star, MessageSquareQuote, ChevronRight, ChevronLeft, Plus, X, Loader2, CheckCircle2 } from 'lucide-react'
@@ -91,7 +91,7 @@ export function TestimonialsSection() {
         <MessageSquareQuote className="w-12 h-12 text-gold/20 absolute bottom-4 left-4" />
         
         <p className="text-lg md:text-xl text-text leading-relaxed font-medium mb-6 relative z-10 px-8">
-          "{testimonials[activeIndex].content}"
+          &quot;{testimonials[activeIndex].content}&quot;
         </p>
         
         <div className="flex flex-col items-center justify-center gap-2">

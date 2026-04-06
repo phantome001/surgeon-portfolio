@@ -1,4 +1,4 @@
-﻿'use client'
+'use client'
 
 import { useState, useEffect } from 'react'
 import { Star, MessageSquareQuote, Check, X, Loader2, Trash2, Plus, AlertTriangle } from 'lucide-react'
@@ -290,7 +290,7 @@ export function TestimonialsTab() {
               <div className="bg-navy-900 rounded-xl p-4 relative">
                 <MessageSquareQuote className="w-8 h-8 text-surface absolute top-2 left-2 rotate-180 opacity-50" />
                 <p className="text-muted text-sm leading-relaxed relative z-10 break-words">
-                  "{item.content}"
+                  &quot;{item.content}&quot;
                 </p>
                 <div className="text-xs text-muted/50 mt-3 text-left">
                   {new Date(item.created_at).toLocaleDateString('ar-LY')}
