@@ -1,7 +1,6 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
 import { CalendarDays, Film, BarChart3, Check, Clock, Users, Mail, Settings, Camera } from 'lucide-react'
 import { getSupabaseClient } from '@/lib/supabase/client'
 import { AppointmentsTab } from './AppointmentsTab'
