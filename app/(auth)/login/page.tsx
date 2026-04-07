@@ -1,4 +1,4 @@
-﻿'use client'
+'use client'
 
 import { useState } from 'react'
 import { getSupabaseClient } from '@/lib/supabase/client'
@@ -6,7 +6,9 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { LogIn, Mail, Lock, Eye, EyeOff } from 'lucide-react'
 
-export default function LoginPage() {
+import { Suspense } from 'react'
+
+function LoginForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const successUrl = searchParams.get('callbackUrl')
@@ -154,5 +156,13 @@ export default function LoginPage() {
         </div>
       </div>
     </div>
+  )
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center bg-navy-900 text-gold">جاري التحميل...</div>}>
+      <LoginForm />
+    </Suspense>
   )
 }
