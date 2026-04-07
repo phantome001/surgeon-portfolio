@@ -4,6 +4,7 @@ import './globals.css'
 import { WhatsAppButton } from '@/components/WhatsAppButton'
 import { AIAssistant } from '@/components/ai/AIAssistant'
 import { PWARegister } from '@/components/PWARegister'
+import { Analytics } from '@vercel/analytics/next'
 
 const ibmPlexSansArabic = IBM_Plex_Sans_Arabic({ 
   weight: ['300', '400', '500', '600', '700'],
@@ -51,6 +52,7 @@ export default function RootLayout({
         <WhatsAppButton />
         <AIAssistant />
         <PWARegister />
+        <Analytics />
       </body>
     </html>
   )
