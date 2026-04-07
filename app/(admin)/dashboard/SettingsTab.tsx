@@ -268,7 +268,7 @@ export function SettingsTab() {
                   {field.label}
                 </label>
                 <div className="flex gap-2">
-                  {field.isTextarea ? (
+                  {('isTextarea' in field && field.isTextarea) ? (
                     <textarea
                       value={settings[field.key as keyof SiteSettings] || ''}
                       onChange={(e) => setSettings({ ...settings, [field.key]: e.target.value })}

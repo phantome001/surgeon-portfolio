@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react'
 import { CalendarDays, Film, BarChart3, Check, Clock, Users, Mail, Settings, Camera } from 'lucide-react'
-import { getSupabaseClient } from '@/lib/supabase/client'
 import { AppointmentsTab } from './AppointmentsTab'
 import { VideosTab } from './VideosTab'
 import { StatsTab } from './StatsTab'
@@ -29,7 +28,6 @@ export default function AdminDashboard() {
   const [appointments, setAppointments] = useState<Appointment[]>([])
   const [loading, setLoading] = useState(true)
   const [stats, setStats] = useState({ pending: 0, confirmed: 0, today: 0, total: 0 })
-  const supabase = getSupabaseClient()
 
   const fetchAppointments = async () => {
     setLoading(true)

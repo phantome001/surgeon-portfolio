@@ -1,4 +1,4 @@
-﻿'use client'
+'use client'
 
 import { useState, useRef, useCallback } from 'react'
 
@@ -31,7 +31,9 @@ export function BeforeAfterSlider({ beforeImage, afterImage, title }: BeforeAfte
   }, [isDragging, handleMove])
 
   const handleTouchMove = useCallback((e: React.TouchEvent) => {
-    handleMove(e.touches[0].clientX)
+    if (e.touches && e.touches[0]) {
+      handleMove(e.touches[0].clientX)
+    }
   }, [handleMove])
 
   const handleClick = useCallback((e: React.MouseEvent) => {

@@ -15,12 +15,11 @@ export async function PATCH(
 
     const { ai_enabled } = await request.json()
 
-    const { data, error } = await (supabase
-      .from('conversations')
-      .update({ ai_enabled } as any)
+    const { data, error } = await ((supabase.from('conversations') as any)
+      .update({ ai_enabled })
       .eq('id', params.id)
       .select()
-      .single() as any)
+      .single())
 
     if (error) throw error
 

@@ -91,7 +91,7 @@ export function TestimonialsSection() {
         <MessageSquareQuote className="w-12 h-12 text-gold/20 absolute bottom-4 left-4" />
         
         <p className="text-lg md:text-xl text-text leading-relaxed font-medium mb-6 relative z-10 px-8">
-          &quot;{testimonials[activeIndex].content}&quot;
+          &quot;{testimonials[activeIndex]?.content}&quot;
         </p>
         
         <div className="flex flex-col items-center justify-center gap-2">
@@ -99,12 +99,12 @@ export function TestimonialsSection() {
             {[1, 2, 3, 4, 5].map((star) => (
               <Star 
                 key={star} 
-                className={`w-4 h-4 ${star <= testimonials[activeIndex].rating ? 'text-yellow-400 fill-yellow-400' : 'text-gray-600'}`} 
+                className={`w-4 h-4 ${star <= (testimonials[activeIndex]?.rating || 0) ? 'text-yellow-400 fill-yellow-400' : 'text-gray-600'}`} 
               />
             ))}
           </div>
           <h4 className="font-bold text-gold text-lg">
-            {testimonials[activeIndex].patient_name}
+            {testimonials[activeIndex]?.patient_name}
           </h4>
         </div>
       </div>

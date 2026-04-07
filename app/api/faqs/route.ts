@@ -21,8 +21,7 @@ export async function POST(request: Request) {
   const supabase = createAdminClient()
   try {
     const { question, answer, sort_order } = await request.json()
-    const { data, error } = await supabase
-      .from('faqs')
+    const { data, error } = await (supabase.from('faqs') as any)
       .insert([{ question, answer, sort_order }])
       .select()
       .single()
@@ -39,8 +38,7 @@ export async function PATCH(request: Request) {
   const supabase = createAdminClient()
   try {
     const { id, ...updates } = await request.json()
-    const { error } = await supabase
-      .from('faqs')
+    const { error } = await (supabase.from('faqs') as any)
       .update(updates)
       .eq('id', id)
 
@@ -60,8 +58,7 @@ export async function DELETE(request: Request) {
     
     if (!id) return NextResponse.json({ error: 'ID required' }, { status: 400 })
 
-    const { error } = await supabase
-      .from('faqs')
+    const { error } = await (supabase.from('faqs') as any)
       .delete()
       .eq('id', id)
 
