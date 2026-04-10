@@ -114,7 +114,6 @@ export function Navbar({ initialUser }: NavbarProps) {
                   </div>
                 </div>
               ) : null}
-              )}
             </div>
 
             {/* Mobile Toggle Button */}
@@ -232,7 +231,6 @@ export function Navbar({ initialUser }: NavbarProps) {
                 </button>
               </div>
               ) : null}
-            )}
           </div>
 
           {/* Bottom Branding */}
