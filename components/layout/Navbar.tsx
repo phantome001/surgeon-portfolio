@@ -52,10 +52,10 @@ export function Navbar({ initialUser }: NavbarProps) {
     <>
       <header className="sticky top-0 z-50 border-b border-white/5 bg-navy-900/80 backdrop-blur-xl">
         <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex h-16 items-center justify-between">
+          <div className="flex h-16 items-center justify-between relative">
             
             {/* Right: Logo */}
-            <div className="flex items-center gap-8">
+            <div className="flex items-center shrink-0">
               <Link href="/" className="flex items-center gap-2 group shrink-0">
                 <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-gold to-gold-light flex items-center justify-center shadow-lg shadow-gold/20 transition-transform group-hover:rotate-12">
                   <Stethoscope className="w-5 h-5 text-navy-900" />
@@ -64,23 +64,23 @@ export function Navbar({ initialUser }: NavbarProps) {
                   د. غنوش زين الدين
                 </span>
               </Link>
+            </div>
 
-              {/* Desktop Center Links */}
-              <div className="hidden md:flex items-center gap-1">
-                {navItems.map((item) => (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
-                      pathname === item.href
-                        ? 'text-gold bg-gold/10'
-                        : 'text-muted hover:text-text hover:bg-white/5'
-                    }`}
-                  >
-                    {item.label}
-                  </Link>
-                ))}
-              </div>
+            {/* Center: Desktop Navigation Links */}
+            <div className="hidden md:flex items-center gap-1 absolute left-1/2 -translate-x-1/2">
+              {navItems.map((item) => (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+                    pathname === item.href
+                      ? 'text-gold bg-gold/10'
+                      : 'text-muted hover:text-text hover:bg-white/5'
+                  }`}
+                >
+                  {item.label}
+                </Link>
+              ))}
             </div>
 
             {/* Left: Auth / User Actions (Desktop) */}
