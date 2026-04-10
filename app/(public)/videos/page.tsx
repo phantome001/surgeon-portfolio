@@ -1,4 +1,4 @@
-﻿'use client'
+'use client'
 
 import { useState, useEffect } from 'react'
 import { getSupabaseClient } from '@/lib/supabase/client'
@@ -71,6 +71,18 @@ export default function VideosPage() {
     }
     fetchVideos()
   }, [selectedCategory, supabase])
+
+  const handleWatchVideo = async (video: Video) => {
+    setSelectedVideo(video)
+    // Increment view count in background
+    try {
+      await (supabase.from('videos') as any)
+        .update({ views: (video.views || 0) + 1 })
+        .eq('id', video.id)
+    } catch (err) {
+      console.error('Error incrementing views:', err)
+    }
+  }
 
   if (selectedVideo) {
     return (
@@ -152,7 +164,7 @@ export default function VideosPage() {
             {videos.map((video) => (
               <button
                 key={video.id}
-                onClick={() => setSelectedVideo(video)}
+                onClick={() => handleWatchVideo(video)}
                 className="card-glow text-start group overflow-hidden"
               >
                 <div className="aspect-video bg-navy-700 rounded-xl mb-4 flex items-center justify-center relative overflow-hidden">
