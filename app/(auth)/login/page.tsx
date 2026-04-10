@@ -48,15 +48,6 @@ function LoginForm() {
     router.refresh()
   }
 
-  const handleGoogleLogin = async () => {
-    await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: {
-        redirectTo: `${window.location.origin}/auth/callback?next=/dashboard`,
-      },
-    })
-  }
-
   return (
     <div className="min-h-screen flex items-center justify-center py-12 px-4 bg-navy-900">
       <div className="w-full max-w-md">
