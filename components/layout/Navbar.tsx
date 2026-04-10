@@ -83,7 +83,7 @@ export function Navbar({ initialUser }: NavbarProps) {
               ))}
             </div>
 
-            {/* Left: Auth / User Actions (Desktop) */}
+            {/* Left: Logo Icon + Auth (Desktop) */}
             <div className="hidden md:flex items-center gap-4">
               {user ? (
                 <div className="flex items-center gap-3 bg-white/5 p-1.5 pr-4 rounded-2xl border border-white/10">
@@ -113,7 +113,15 @@ export function Navbar({ initialUser }: NavbarProps) {
                     </button>
                   </div>
                 </div>
-              ) : null}
+              ) : (
+                <Link href="/" className="block">
+                  <img 
+                    src="/icons/icon-192.png" 
+                    alt="شعار عيادة د. غنوش" 
+                    className="w-10 h-10 rounded-xl shadow-lg shadow-gold/20 hover:scale-110 transition-transform"
+                  />
+                </Link>
+              )}
             </div>
 
             {/* Mobile Toggle Button */}
