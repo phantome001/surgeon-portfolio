@@ -1,4 +1,4 @@
-﻿'use client'
+'use client'
 
 import { useState, useEffect } from 'react'
 import { Film, Plus, Trash2, Check, X } from 'lucide-react'
@@ -46,6 +46,21 @@ export function VideosTab() {
     fetchData()
   }, [])
 
+  const getYouTubeEmbedUrl = (url: string) => {
+    if (!url) return ''
+    // Standard watch URL: youtube.com/watch?v=VIDEO_ID
+    // Short URL: youtu.be/VIDEO_ID
+    // Embed URL: youtube.com/embed/VIDEO_ID
+    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/
+    const match = url.match(regExp)
+    const videoId = (match && match[2].length === 11) ? match[2] : null
+    
+    if (videoId) {
+      return `https://www.youtube.com/embed/${videoId}`
+    }
+    return url // Return as is if not a YouTube URL
+  }
+
   const handleAddVideo = async (e: React.FormEvent) => {
     e.preventDefault()
     
@@ -56,10 +71,12 @@ export function VideosTab() {
       return
     }
 
+    const embedUrl = getYouTubeEmbedUrl(formData.embed_url)
+
     const { error } = await (supabase.from('videos') as any).insert({
       title_ar: formData.title_ar,
       title_fr: formData.title_fr,
-      embed_url: formData.embed_url,
+      embed_url: embedUrl,
       category_id: categoryId,
       is_published: true
     })
@@ -126,8 +143,8 @@ export function VideosTab() {
               </select>
             </div>
             <div>
-              <label className="block text-sm text-muted mb-1">رابط الفيديو (Embed URL)</label>
-              <input required type="url" className="input-field" value={formData.embed_url} onChange={e => setFormData({...formData, embed_url: e.target.value})} placeholder="https://www.youtube.com/embed/..." />
+              <label className="block text-sm text-muted mb-1">رابط الفيديو (YouTube link)</label>
+              <input required type="url" className="input-field" value={formData.embed_url} onChange={e => setFormData({...formData, embed_url: e.target.value})} placeholder="https://www.youtube.com/watch?v=..." title="يمكنك وضع رابط يوتيوب العادي وسنقوم بتحويله تلقائياً" />
             </div>
           </div>
           <button type="submit" className="btn-primary w-full py-2">حفظ الفيديو</button>
