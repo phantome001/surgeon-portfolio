@@ -33,6 +33,16 @@ export default function VideosPage() {
   const [loading, setLoading] = useState(true)
   const supabase = getSupabaseClient()
 
+  const getVideoId = (embedUrl: string) => {
+    const match = embedUrl.match(/embed\/([^?&#]+)/)
+    return match ? match[1] : null
+  }
+
+  const getThumbnail = (embedUrl: string) => {
+    const videoId = getVideoId(embedUrl)
+    return videoId ? `https://img.youtube.com/vi/${videoId}/hqdefault.jpg` : null
+  }
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -73,8 +83,11 @@ export default function VideosPage() {
   }, [selectedCategory, supabase])
 
   const handleWatchVideo = async (video: Video) => {
-    setSelectedVideo(video)
-    // Increment view count in background
+    // Update local state immediately to show new count
+    const updatedVideo = { ...video, views: (video.views || 0) + 1 }
+    setSelectedVideo(updatedVideo)
+    setVideos(prev => prev.map(v => v.id === video.id ? updatedVideo : v))
+    // Increment view count in database
     try {
       await (supabase.from('videos') as any)
         .update({ views: (video.views || 0) + 1 })
@@ -168,11 +181,18 @@ export default function VideosPage() {
                 className="card-glow text-start group overflow-hidden"
               >
                 <div className="aspect-video bg-navy-700 rounded-xl mb-4 flex items-center justify-center relative overflow-hidden">
-                  <div className="w-14 h-14 rounded-full bg-gold/20 flex items-center justify-center group-hover:bg-gold/30 transition-colors">
-                    <Play className="w-7 h-7 text-gold fill-gold" />
+                  {getThumbnail(video.embed_url) ? (
+                    <img
+                      src={getThumbnail(video.embed_url)!}
+                      alt={video.title_ar}
+                      className="w-full h-full object-cover absolute inset-0"
+                    />
+                  ) : null}
+                  <div className="w-14 h-14 rounded-full bg-black/50 backdrop-blur-sm flex items-center justify-center group-hover:bg-gold/80 transition-colors z-10">
+                    <Play className="w-7 h-7 text-white fill-white" />
                   </div>
-                  <div className="absolute bottom-2 left-2 bg-black/60 text-white text-xs px-2 py-0.5 rounded">
-                    {video.duration}
+                  <div className="absolute bottom-2 right-2 bg-black/70 text-white text-xs px-2 py-0.5 rounded flex items-center gap-1 z-10">
+                    <Eye className="w-3 h-3" /> {video.views || 0}
                   </div>
                 </div>
                 <h3 className="font-semibold text-text group-hover:text-gold transition-colors mb-2">
