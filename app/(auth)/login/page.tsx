@@ -3,7 +3,6 @@
 import { useState } from 'react'
 import { getSupabaseClient } from '@/lib/supabase/client'
 import { useRouter, useSearchParams } from 'next/navigation'
-import Link from 'next/link'
 import { LogIn, Mail, Lock, Eye, EyeOff } from 'lucide-react'
 
 import { Suspense } from 'react'
