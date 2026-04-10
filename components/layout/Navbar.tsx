@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { useState, useEffect } from 'react'
-import { Menu, X, Stethoscope, LogOut, LayoutDashboard, Home, Camera, Video, Phone, UserPlus, LogIn } from 'lucide-react'
+import { Menu, X, Stethoscope, LogOut, LayoutDashboard, Home, Camera, Video, Phone } from 'lucide-react'
 import { getSupabaseClient } from '@/lib/supabase/client'
 import { useSupabaseUser } from '@/hooks/useSupabaseUser'
 
