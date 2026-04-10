@@ -113,21 +113,7 @@ export function Navbar({ initialUser }: NavbarProps) {
                     </button>
                   </div>
                 </div>
-              ) : (
-                <div className="flex items-center gap-2">
-                  <Link
-                    href="/login"
-                    className="text-sm font-semibold text-muted hover:text-text px-5 py-2.5 transition-colors"
-                  >
-                    تسجيل الدخول
-                  </Link>
-                  <Link 
-                    href="/register" 
-                    className="px-6 py-2.5 bg-gold hover:bg-gold-light text-navy-900 text-sm font-bold rounded-xl shadow-lg shadow-gold/20 transition-all active:scale-95"
-                  >
-                    إنشاء حساب
-                  </Link>
-                </div>
+              ) : null}
               )}
             </div>
 
@@ -245,29 +231,7 @@ export function Navbar({ initialUser }: NavbarProps) {
                   تسجيل الخروج
                 </button>
               </div>
-            ) : (
-              <div className="space-y-2">
-                <Link 
-                  href="/login" 
-                  onClick={() => setOpen(false)}
-                  className="flex items-center gap-4 w-full px-4 py-3.5 rounded-xl text-sm font-semibold text-muted hover:text-text hover:bg-white/5 transition-all"
-                >
-                  <div className="w-9 h-9 rounded-lg flex items-center justify-center bg-white/5">
-                    <LogIn className="w-[18px] h-[18px]" />
-                  </div>
-                  تسجيل الدخول
-                </Link>
-                <Link 
-                  href="/register" 
-                  onClick={() => setOpen(false)}
-                  className="flex items-center gap-4 w-full px-4 py-3.5 rounded-xl text-sm font-bold text-navy-900 bg-gradient-to-l from-gold to-gold-light shadow-md shadow-gold/20 transition-all active:scale-[0.98]"
-                >
-                  <div className="w-9 h-9 rounded-lg flex items-center justify-center bg-navy-900/20">
-                    <UserPlus className="w-[18px] h-[18px]" />
-                  </div>
-                  إنشاء حساب جديد
-                </Link>
-              </div>
+              ) : null}
             )}
           </div>
 
