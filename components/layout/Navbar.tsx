@@ -114,11 +114,11 @@ export function Navbar({ initialUser }: NavbarProps) {
                   </div>
                 </div>
               ) : (
-                <Link href="/" className="block">
+                <Link href="/" className="block overflow-hidden rounded-xl shadow-lg shadow-gold/20">
                   <img 
                     src="/icons/icon-192.png" 
                     alt="شعار عيادة د. غنوش" 
-                    className="w-10 h-10 rounded-xl shadow-lg shadow-gold/20 hover:scale-110 transition-transform"
+                    className="w-14 h-14 object-cover scale-110 hover:scale-125 transition-transform duration-300"
                   />
                 </Link>
               )}
