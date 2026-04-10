@@ -2,6 +2,8 @@
 const nextConfig = {
   images: {
     remotePatterns: [
+      { hostname: 'img.youtube.com' },
+      { hostname: 'i.ytimg.com' },
       { hostname: 'lh3.googleusercontent.com' },
       { hostname: '*.supabase.co' },
     ],
@@ -22,7 +24,7 @@ const nextConfig = {
           },
           {
             key: 'Content-Security-Policy',
-            value: "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' blob: data: https://*.supabase.co https://lh3.googleusercontent.com https://i.ytimg.com https://*.ytimg.com; connect-src 'self' https://*.supabase.co https://generativelanguage.googleapis.com https://openrouter.ai https://wa.me; frame-src 'self' https://www.youtube.com https://youtube.com; frame-ancestors 'none';",
+            value: "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' blob: data: https://*.supabase.co https://lh3.googleusercontent.com https://i.ytimg.com https://img.youtube.com https://*.ytimg.com; connect-src 'self' https://*.supabase.co https://generativelanguage.googleapis.com https://openrouter.ai https://wa.me; frame-src 'self' https://www.youtube.com https://youtube.com; frame-ancestors 'none';",
           },
         ],
       },
