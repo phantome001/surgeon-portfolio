@@ -44,13 +44,29 @@ export default async function HomePage() {
   return (
     <div className="overflow-x-hidden">
       {/* Hero Section */}
-      <section className="relative py-20 md:py-32 overflow-hidden">
-        {/* Background decorations */}
-        <div className="absolute inset-0 bg-gradient-to-b from-gold/5 via-transparent to-transparent" />
-        <div className="absolute top-20 -right-20 w-72 h-72 bg-gold/5 rounded-full blur-3xl" />
-        <div className="absolute bottom-10 -left-20 w-72 h-72 bg-teal/5 rounded-full blur-3xl" />
+      <section className="relative py-20 md:py-32 overflow-hidden min-h-[600px] flex items-center justify-center">
+        {/* Background Video */}
+        <div className="absolute inset-0 w-full h-full z-0">
+          <video
+            autoPlay
+            loop
+            muted
+            playsInline
+            className="w-full h-full object-cover opacity-40 mix-blend-screen"
+          >
+            <source src="/videos/hero-bg.mp4" type="video/mp4" />
+          </video>
+          {/* Overlays for readability and blending */}
+          <div className="absolute inset-0 bg-navy-900/40 mix-blend-multiply" />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#0a0f1c] via-[#0a0f1c]/80 to-transparent" />
+        </div>
 
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        {/* Background decorations */}
+        <div className="absolute inset-0 bg-gradient-to-b from-gold/5 via-transparent to-transparent z-0 pointer-events-none" />
+        <div className="absolute top-20 -right-20 w-72 h-72 bg-gold/10 rounded-full blur-3xl z-0 pointer-events-none" />
+        <div className="absolute bottom-10 -left-20 w-72 h-72 bg-teal/10 rounded-full blur-3xl z-0 pointer-events-none" />
+
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center mt-8">
           {/* Avatar */}
           <div className="mx-auto w-28 h-28 rounded-full bg-gradient-to-br from-gold to-gold-light p-1 mb-6 animate-pulse-gold">
             <div className="w-full h-full rounded-full bg-navy-800 flex items-center justify-center">
