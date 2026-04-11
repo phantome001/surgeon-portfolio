@@ -5,7 +5,8 @@ import { HomeContactInfo } from '@/components/HomeContactInfo'
 import { TestimonialsSection } from '@/components/TestimonialsSection'
 import { InteractiveAnatomy } from '@/components/InteractiveAnatomy'
 import { FAQSection } from '@/components/FAQSection'
-
+import { LaparoscopeOverlay } from '@/components/animations/LaparoscopeOverlay'
+import { AnimatedStomachSVG } from '@/components/animations/AnimatedStomachSVG'
 
 
 const credentials = [
@@ -43,6 +44,8 @@ export default async function HomePage() {
 
   return (
     <div className="overflow-x-hidden">
+      <LaparoscopeOverlay />
+      
       {/* Hero Section */}
       <section className="relative py-20 md:py-32 overflow-hidden min-h-[600px] flex items-center justify-center">
         {/* Background Video */}
@@ -78,8 +81,8 @@ export default async function HomePage() {
             <span className="gold-gradient">{settings.doctor_name || 'د. غنوش زين الدين'}</span>
           </h1>
 
-          <div className="inline-flex items-center gap-2 bg-teal/10 border border-teal/20 rounded-full px-4 py-2 mb-6 animate-fade-in stagger-1">
-            <Sparkles className="w-4 h-4 text-teal" />
+          <div className="inline-flex items-center gap-2 bg-teal/10 border border-teal/20 rounded-full px-4 py-2 mb-6 animate-fade-in stagger-1 group cursor-default hover:bg-teal/20 transition-all">
+            <Sparkles className="w-4 h-4 text-teal group-hover:animate-glow-spin" />
             <span className="text-teal text-sm font-medium">
               {settings.doctor_specialty || 'جراح اختصاصي في أمراض الجهاز الهضمي'}
             </span>
@@ -94,9 +97,9 @@ export default async function HomePage() {
             {dynamicStats.map((stat) => {
               const Icon = stat.icon
               return (
-                <div key={stat.label} className="text-center">
-                  <Icon className="w-5 h-5 text-gold mx-auto mb-1" />
-                  <p className="text-xl sm:text-2xl md:text-3xl font-bold text-gold font-display">{stat.value}</p>
+                <div key={stat.label} className="text-center group cursor-default">
+                  <Icon className={`w-6 h-6 text-gold mx-auto mb-2 transition-all duration-300 ${stat.icon === Heart ? 'group-hover:animate-heartbeat group-hover:text-red-400' : 'group-hover:animate-float group-hover:text-gold-light'}`} />
+                  <p className="text-xl sm:text-2xl md:text-3xl font-bold text-gold font-display transition-colors group-hover:text-white">{stat.value}</p>
                   <p className="text-xs text-muted">{stat.label}</p>
                 </div>
               )
@@ -115,8 +118,9 @@ export default async function HomePage() {
       </section>
 
       {/* Credentials Section */}
-      <section className="py-16 md:py-24">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section className="py-16 md:py-24 relative overflow-hidden">
+        <AnimatedStomachSVG />
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="section-heading text-center">الشهادات والمؤهلات</h2>
           <p className="section-subheading text-center">تدريب أكاديمي ومهني على أعلى مستوى</p>
 
@@ -124,10 +128,10 @@ export default async function HomePage() {
             {credentials.map((cred, i) => {
               const Icon = cred.icon
               return (
-                <div key={cred.title} className={`card-glow animate-slide-up stagger-${i + 1}`}>
+                <div key={cred.title} className={`card-glow animate-slide-up stagger-${i + 1} group`}>
                   <div className="flex items-start gap-4">
-                    <div className="w-12 h-12 rounded-xl bg-gold/10 flex items-center justify-center flex-shrink-0">
-                      <Icon className="w-6 h-6 text-gold" />
+                    <div className="w-12 h-12 rounded-xl bg-gold/10 flex items-center justify-center flex-shrink-0 transition-transform duration-500 group-hover:-rotate-12 group-hover:scale-110">
+                      <Icon className="w-6 h-6 text-gold group-hover:text-gold-light" />
                     </div>
                     <div>
                       <h3 className="font-semibold text-text mb-1">{cred.title}</h3>
