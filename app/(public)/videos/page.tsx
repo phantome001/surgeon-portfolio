@@ -33,16 +33,6 @@ export default function VideosPage() {
   const [loading, setLoading] = useState(true)
   const supabase = getSupabaseClient()
 
-  const getVideoId = (embedUrl: string) => {
-    const match = embedUrl.match(/embed\/([^?&#]+)/)
-    return match ? match[1] : null
-  }
-
-  const getThumbnail = (embedUrl: string) => {
-    const videoId = getVideoId(embedUrl)
-    return videoId ? `https://img.youtube.com/vi/${videoId}/hqdefault.jpg` : null
-  }
-
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -181,13 +171,7 @@ export default function VideosPage() {
                 className="card-glow text-start group overflow-hidden"
               >
                 <div className="aspect-video bg-navy-700 rounded-xl mb-4 flex items-center justify-center relative overflow-hidden">
-                  {getThumbnail(video.embed_url) ? (
-                    <img
-                      src={getThumbnail(video.embed_url)!}
-                      alt={video.title_ar}
-                      className="w-full h-full object-cover absolute inset-0"
-                    />
-                  ) : null}
+                  {/* Removed thumbnail as requested */}
                   <div className="w-14 h-14 rounded-full bg-black/50 backdrop-blur-sm flex items-center justify-center group-hover:bg-gold/80 transition-colors z-10">
                     <Play className="w-7 h-7 text-white fill-white" />
                   </div>
