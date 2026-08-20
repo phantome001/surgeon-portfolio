@@ -204,6 +204,8 @@ export default function ChatPage() {
 
     if (res.ok) {
       setNewMessage('')
+      // إعادة تحميل الرسائل لعرض رسالة المستخدم ورد الذكاء الاصطناعي التلقائي
+      setTimeout(() => loadChat(), 500)
     }
     setSending(false)
   }
