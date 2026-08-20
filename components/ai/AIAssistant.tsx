@@ -38,7 +38,10 @@ export function AIAssistant() {
       if (data.text) {
         setMessages(prev => [...prev, { role: 'assistant', content: data.text }])
       } else {
-        setMessages(prev => [...prev, { role: 'assistant', content: 'نعتذر، المساعد مشغول حالياً. تواصل عبر واتساب.' }])
+        const errMsg = data?.retry
+          ? 'نعتذر، وصلت خدمة الذكاء الاصطناعي مؤقتًا إلى حد الطلبات. حاول مرة أخرى خلال دقيقة أو تواصل عبر واتساب.'
+          : 'نعتذر، المساعد مشغول حالياً. تواصل عبر واتساب.'
+        setMessages(prev => [...prev, { role: 'assistant', content: errMsg }])
       }
     } catch {
       setMessages(prev => [...prev, { role: 'assistant', content: 'نعتذر، المساعد مشغول حالياً. تواصل عبر واتساب.' }])

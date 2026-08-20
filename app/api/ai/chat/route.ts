@@ -49,6 +49,30 @@ export async function POST(req: Request) {
           })
         })
 
+        // معالجة تجاوز الحصة (429) — retry واحد بعد انتظار قصير
+        if (response.status === 429) {
+          console.error('Raw Gemini 429 (quota). Retrying once after delay...')
+          await new Promise(r => setTimeout(r, 8000))
+          const retryRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              contents: [{
+                parts: [{ text: `${SYSTEM_PROMPT}\n\nPatient Message: ${lastMessage}` }]
+              }]
+            }),
+          })
+          if (retryRes.ok) {
+            const retryData = await retryRes.json()
+            const retryText = retryData.candidates?.[0]?.content?.parts?.[0]?.text
+            if (retryText) {
+              console.log('Success with Raw Gemini retry!')
+              return NextResponse.json({ text: retryText })
+            }
+          }
+          return NextResponse.json({ error: 'طلبات كثيرة. حاول بعد دقيقة.', retry: true }, { status: 429 })
+        }
+
         const data = await response.json()
         const text = data.candidates?.[0]?.content?.parts?.[0]?.text
         

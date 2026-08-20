@@ -24,7 +24,14 @@ async function generateAiReply(content: string): Promise<string> {
       }),
     })
     const aiData = await response.json()
-    if (aiData?.error?.message) console.error('[GEMINI]', aiData.error.code, aiData.error.message)
+    if (aiData?.error?.message) {
+      console.error('[GEMINI]', aiData.error.code, aiData.error.message)
+      // تجاوز الحصة (429) أو مشكلة مؤقتة — لا نفشل بصمت
+      if (response.status === 429) {
+        return 'نعتذر، وصلت خدمة الذكاء الاصطناعي إلى الحد الأقصى من الطلبات حاليًا. سيعود المساعد للعمل خلال دقائق قليلة.'
+      }
+      return ''
+    }
     return aiData.candidates?.[0]?.content?.parts?.[0]?.text || ''
   } catch (e) {
     console.error('[GEMINI_EXCEPTION]', e)
