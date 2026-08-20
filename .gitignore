@@ -56,3 +56,5 @@ logs/
 # Database backups (uncomment if you want to exclude)
 # *.sql
 # *.dump
+pnpm-lock.yaml
+pnpm-workspace.yaml
