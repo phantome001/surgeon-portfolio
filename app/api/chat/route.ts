@@ -3,8 +3,10 @@ import { createClient, createAdminClient } from '@/lib/supabase/server'
 import { encrypt, decrypt } from '@/lib/encryption'
 
 const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY
-// يمكنك اختيار الموديل الذي تريده هنا، مثلاً: google/gemini-flash-1.5-exp:free أو claude-3-haiku-20240307
-const AI_MODEL = "google/gemini-flash-1.5-exp:free" 
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY
+// يمكنك اختيار الموديل الذي تريده هنا، مثلاً: gemini-2.5-flash أو claude-3-haiku-20240307
+const AI_MODEL = "gemini-2.5-flash"
+const GEMINI_SYSTEM_PROMPT = "أنت مساعد جراح محترف وخبير. وظيفتك هي الرد على تساؤلات المرضى وتوجيههم بلطف ومهنية باللغة العربية. إذا سأل المريض عن أعراض مقلقة، وجهه فوراً لحجز موعد في العيادة للفحص البدني. لا تصف أدوية قوية، بل قدم نصائح رعاية أولية فقط. أنت تمثل الدكتور وتنسق مع المرضى."
 
 export async function GET(request: NextRequest) {
   try {
@@ -74,10 +76,25 @@ export async function POST(request: NextRequest) {
       .eq('id', conversationId)
       .single()
 
-    // --- AI RESPONSE VIA OPENROUTER ---
-    if ((conv as any)?.ai_enabled && OPENROUTER_API_KEY) {
+    // --- AI RESPONSE (Gemini أولاً، ثم OpenRouter كبديل) ---
+    if ((conv as any)?.ai_enabled && (GEMINI_API_KEY || OPENROUTER_API_KEY)) {
       try {
-        const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+        let aiText = ""
+        if (GEMINI_API_KEY) {
+          const url = `https://generativelanguage.googleapis.com/v1beta/models/${AI_MODEL}:generateContent?key=${GEMINI_API_KEY}`
+          const response = await fetch(url, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              system_instruction: { parts: [{ text: GEMINI_SYSTEM_PROMPT }] },
+              contents: [{ role: "user", parts: [{ text: content }] }],
+              generationConfig: { temperature: 0.7 }
+            })
+          })
+          const aiData = await response.json()
+          aiText = aiData.candidates?.[0]?.content?.parts?.[0]?.text || ""
+        } else {
+          const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
           method: "POST",
           headers: {
             "Authorization": `Bearer ${OPENROUTER_API_KEY}`,
@@ -86,20 +103,18 @@ export async function POST(request: NextRequest) {
             "Content-Type": "application/json"
           },
           body: JSON.stringify({
-            "model": AI_MODEL,
-            "messages": [
-              {
-                "role": "system",
-                "content": "أنت مساعد جراح محترف وخبير. وظيفتك هي الرد على تساؤلات المرضى وتوجيههم بلطف ومهنية باللغة العربية. إذا سأل المريض عن أعراض مقلقة، وجهه فوراً لحجز موعد في العيادة للفحص البدني. لا تصف أدوية قوية، بل قدم نصائح رعاية أولية فقط. أنت تمثل الدكتور وتنسق مع المرضى."
-              },
-              { "role": "user", "content": content }
-            ],
-            "temperature": 0.7
+              "model": AI_MODEL,
+              "messages": [
+                { "role": "system", "content": GEMINI_SYSTEM_PROMPT },
+                { "role": "user", "content": content }
+              ],
+              "temperature": 0.7
+            })
           })
-        });
-
-        const aiData = await response.json();
-        const aiText = aiData.choices?.[0]?.message?.content || "عذراً، هناك مشكلة في معالجة طلبك حالياً.";
+          const aiData = await response.json()
+          aiText = aiData.choices?.[0]?.message?.content || ""
+        }
+        if (!aiText) aiText = "عذراً، هناك مشكلة في معالجة طلبك حالياً."
         const encryptedAiText = encrypt(aiText)
 
         const admin = createAdminClient()
