@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient, createAdminClient } from '@/lib/supabase/server'
+import { createClient } from '@/lib/supabase/server'
 import { messageSchema } from '@/lib/validations/chat'
 import { encrypt } from '@/lib/encryption'
 
