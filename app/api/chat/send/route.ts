@@ -24,8 +24,10 @@ async function generateAiReply(content: string): Promise<string> {
       }),
     })
     const aiData = await response.json()
+    if (aiData?.error?.message) console.error('[GEMINI]', aiData.error.code, aiData.error.message)
     return aiData.candidates?.[0]?.content?.parts?.[0]?.text || ''
-  } catch {
+  } catch (e) {
+    console.error('[GEMINI_EXCEPTION]', e)
     return ''
   }
 }

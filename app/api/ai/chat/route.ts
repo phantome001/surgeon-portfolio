@@ -39,7 +39,7 @@ export async function POST(req: Request) {
     if (GEMINI_API_KEY) {
       try {
         console.log('Trying Direct Google Gemini (Raw Fetch)...')
-        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`, {
+        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -56,7 +56,7 @@ export async function POST(req: Request) {
           console.log('Success with Raw Gemini!')
           return NextResponse.json({ text })
         }
-        console.error('Raw Gemini Empty Response:', data)
+        console.error('Raw Gemini Empty Response:', data?.error?.message || data)
       } catch (geminiError: any) {
         console.error('Raw Gemini Failed:', geminiError?.message || geminiError)
       }
@@ -74,7 +74,7 @@ export async function POST(req: Request) {
             'X-Title': 'Surgeon AI Triage',
           },
           body: JSON.stringify({
-            model: 'google/gemini-2.0-flash-001',
+            model: 'google/gemini-2.5-flash',
             messages: [
               { role: 'system', content: SYSTEM_PROMPT },
               ...messages
