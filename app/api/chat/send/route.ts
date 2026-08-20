@@ -74,14 +74,28 @@ export async function POST(request: NextRequest) {
     if (aiEnabled) {
       const aiText = await generateAiReply(content)
       if (aiText) {
-        const admin = createAdminClient()
-        await admin
-          .from('messages')
-          .insert({
-            conversation_id: conversationId,
-            sender_id: null,
-            content_encrypted: encrypt(aiText),
-          } as any)
+        // إدراج رد AI عبر REST مع service role key (RLS bypass) — أوثق من createServerClient
+        const insertRes = await fetch(
+          `${process.env.NEXT_PUBLIC_SUPABASE_URL}/rest/v1/messages`,
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              apikey: process.env.SUPABASE_SERVICE_ROLE_KEY || '',
+              Authorization: `Bearer ${process.env.SUPABASE_SERVICE_ROLE_KEY}`,
+              Prefer: 'return=minimal',
+            },
+            body: JSON.stringify({
+              conversation_id: conversationId,
+              sender_id: null,
+              content_encrypted: encrypt(aiText),
+            }),
+          }
+        )
+        if (!insertRes.ok) {
+          const errBody = await insertRes.text().catch(() => '')
+          console.error('[AI_REPLY_INSERT]', insertRes.status, errBody)
+        }
       }
     }
 
