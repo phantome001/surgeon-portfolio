@@ -134,15 +134,15 @@ export default function AppointmentsPage() {
               </button>
             </div>
 
-            <div className="grid grid-cols-7 gap-1 text-center mb-2">
+            <div dir="rtl" className="grid grid-cols-7 gap-1 text-center mb-2">
               {['إث', 'ثل', 'أر', 'خم', 'جم', 'سب', 'أح'].map((d) => (
                 <div key={d} className="text-xs text-muted py-1">{d}</div>
               ))}
             </div>
 
-            <div className="grid grid-cols-7 gap-1">
+            <div dir="rtl" className="grid grid-cols-7 gap-1">
               {days.map((day, i) => {
-                if (day === null) return <div key={i} />
+                if (day === null) return <div key={i} className="aspect-square" />
                 const d = new Date(year, month, day)
                 const isToday = d.toDateString() === new Date().toDateString()
                 const isPast = d < today

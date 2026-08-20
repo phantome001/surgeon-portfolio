@@ -18,6 +18,7 @@ export default function ChatPage() {
   const [conversationId, setConversationId] = useState<string | null>(null)
   const [userId, setUserId] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
   const [sending, setSending] = useState(false)
   const bottomRef = useRef<HTMLDivElement>(null)
   const supabase = getSupabaseClient()
@@ -27,9 +28,14 @@ export default function ChatPage() {
   }
 
   const loadChat = useCallback(async () => {
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) return
-    setUserId(user.id)
+    try {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) {
+        // غير مسجل: أوقف التحميل ووجّه لصفحة الدخول
+        setLoading(false)
+        return
+      }
+      setUserId(user.id)
 
     // Check for existing conversation
     const convRes: any = await supabase
@@ -64,10 +70,26 @@ export default function ChatPage() {
     }
 
     setLoading(false)
+    } catch (err) {
+      console.error('[chat] فشل تحميل المحادثة:', err)
+      setLoading(false)
+      setError('حدث خطأ أثناء تحميل المحادثة. حاول مرة أخرى.')
+    }
   }, [supabase])
 
   useEffect(() => {
     loadChat()
+    // حماية من التعليق الأبدي: مهلة 10 ثوانٍ توقف التحميل وتعرض رسالة خطأ مع بديل واتساب
+    const timer = setTimeout(() => {
+      setLoading((prev) => {
+        if (prev) {
+          setError('تعذّر فتح المحادثة. جرّب الاتصال مباشرة عبر واتساب.')
+          return false
+        }
+        return prev
+      })
+    }, 10000)
+    return () => clearTimeout(timer)
   }, [loadChat])
 
   // Realtime subscription
@@ -131,6 +153,34 @@ export default function ChatPage() {
     )
   }
 
+  if (error) {
+    return (
+      <div className="flex items-center justify-center min-h-screen p-4">
+        <div className="card text-center py-10 max-w-md w-full">
+          <p className="text-text font-semibold mb-2">⚠️ تعذّر فتح المحادثة</p>
+          <p className="text-sm text-muted mb-4">{error}</p>
+          <p className="text-sm text-muted mb-4">يمكنك أيضاً التواصل مباشرة مع العيادة:</p>
+          <a href="https://wa.me/213550000000" target="_blank" rel="noopener noreferrer"
+            className="btn-teal inline-block">تواصل عبر واتساب</a>
+          <button onClick={() => { setError(''); setLoading(true); setTimeout(() => loadChat(), 300) }}
+            className="btn-secondary mt-3 block w-full">إعادة المحاولة</button>
+        </div>
+      </div>
+    )
+  }
+
+  if (!userId) {
+    return (
+      <div className="flex items-center justify-center min-h-screen p-4">
+        <div className="card text-center py-10 max-w-md w-full">
+          <p className="text-text font-semibold mb-2">يجب تسجيل الدخول لاستخدام المحادثة</p>
+          <p className="text-sm text-muted mb-4">أنشئ حساب مريض أو سجّل دخولك للمتابعة</p>
+          <a href="/login" className="btn-primary">تسجيل الدخول</a>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="flex flex-col h-[calc(100vh-4rem)] md:h-[calc(100vh-4rem)]">
       {/* Header */}
@@ -140,7 +190,7 @@ export default function ChatPage() {
         </div>
         <div>
           <h2 className="font-semibold text-text">محادثة مع الطبيب</h2>
-          <p className="text-xs text-muted">د. أمين بلحاج</p>
+          <p className="text-xs text-muted">د. غنوش زين الدين — جراح اختصاصي</p>
         </div>
       </div>
 

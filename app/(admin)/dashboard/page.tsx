@@ -9,9 +9,10 @@ import { SettingsTab } from './SettingsTab'
 import { MessagesTab } from './MessagesTab'
 import { GalleryTab } from './GalleryTab'
 import { TestimonialsTab } from './TestimonialsTab'
-import { MessageSquareQuote } from 'lucide-react'
+import { ConversationsTab } from './ConversationsTab'
+import { MessageSquareQuote, MessageCircle } from 'lucide-react'
 
-type Tab = 'appointments' | 'settings' | 'videos' | 'stats' | 'messages' | 'gallery' | 'testimonials'
+type Tab = 'appointments' | 'settings' | 'videos' | 'stats' | 'messages' | 'gallery' | 'testimonials' | 'conversations'
 
 interface Appointment {
   id: string
@@ -65,6 +66,7 @@ export default function AdminDashboard() {
     { id: 'testimonials' as Tab, label: 'التقييمات', icon: MessageSquareQuote },
     { id: 'stats' as Tab, label: 'الإحصائيات', icon: BarChart3 },
     { id: 'settings' as Tab, label: 'الإعدادات', icon: Settings },
+    { id: 'conversations' as Tab, label: 'المحادثات', icon: MessageCircle },
   ]
 
   return (
@@ -154,6 +156,8 @@ export default function AdminDashboard() {
           <GalleryTab />
         ) : tab === 'testimonials' ? (
           <TestimonialsTab />
+        ) : tab === 'conversations' ? (
+          <ConversationsTab />
         ) : tab === 'settings' ? (
           <SettingsTab />
         ) : tab === 'stats' ? (

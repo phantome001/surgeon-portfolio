@@ -8,7 +8,14 @@ interface Video {
   id: string
   title_ar: string
   title_fr: string
+  desc_ar: string
+  desc_fr: string
+  description_ar: string
+  description_fr: string
   embed_url: string
+  thumbnail_url: string
+  duration: string
+  consent_approved: boolean
   is_published: boolean
   category_id: string
 }
@@ -29,8 +36,12 @@ export function VideosTab() {
   const [formData, setFormData] = useState({
     title_ar: '',
     title_fr: '',
+    desc_ar: '',
     embed_url: '',
-    category_id: ''
+    thumbnail_url: '',
+    duration: '',
+    category_id: '',
+    consent_approved: false,
   })
 
   const fetchData = async () => {
@@ -73,20 +84,30 @@ export function VideosTab() {
 
     const embedUrl = getYouTubeEmbedUrl(formData.embed_url)
 
+    if (!formData.consent_approved) {
+      alert('⚠️ لا يمكن نشر فيديو عملية دون موافقة المريض المكتوبة — هذا إلزامي قانونياً')
+      return
+    }
+
     const { error } = await (supabase.from('videos') as any).insert({
       title_ar: formData.title_ar,
       title_fr: formData.title_fr,
+      desc_ar: formData.desc_ar,
+      description_ar: formData.desc_ar,
       embed_url: embedUrl,
+      thumbnail_url: formData.thumbnail_url || null,
+      duration: formData.duration || null,
       category_id: categoryId,
+      consent_approved: true,
       is_published: true
     })
     
     if (!error) {
       setIsAdding(false)
-      setFormData({ title_ar: '', title_fr: '', embed_url: '', category_id: '' })
+      setFormData({ title_ar: '', title_fr: '', desc_ar: '', embed_url: '', thumbnail_url: '', duration: '', category_id: '', consent_approved: false })
       fetchData()
     } else {
-      alert('حدث خطأ أثناء إضافة الفيديو')
+      alert('حدث خطأ أثناء إضافة الفيديو: ' + (error?.message || 'خطأ غير معروف'))
     }
   }
 
@@ -146,7 +167,24 @@ export function VideosTab() {
               <label className="block text-sm text-muted mb-1">رابط الفيديو (YouTube link)</label>
               <input required type="url" className="input-field" value={formData.embed_url} onChange={e => setFormData({...formData, embed_url: e.target.value})} placeholder="https://www.youtube.com/watch?v=..." title="يمكنك وضع رابط يوتيوب العادي وسنقوم بتحويله تلقائياً" />
             </div>
+            <div>
+              <label className="block text-sm text-muted mb-1">الوصف بالدارجة الجزائرية (يُعرض تحت الفيديو)</label>
+              <input type="text" className="input-field" value={formData.desc_ar} onChange={e => setFormData({...formData, desc_ar: e.target.value})} placeholder="مثال: عملية بالمنظار، المريض رجع لدارو في نفس النهار" />
+            </div>
+            <div>
+              <label className="block text-sm text-muted mb-1">مدة الفيديو</label>
+              <input type="text" className="input-field" dir="ltr" value={formData.duration} onChange={e => setFormData({...formData, duration: e.target.value})} placeholder="12:34" />
+            </div>
+            <div>
+              <label className="block text-sm text-muted mb-1">رابط الصورة المصغّرة (اختياري)</label>
+              <input type="url" className="input-field" value={formData.thumbnail_url} onChange={e => setFormData({...formData, thumbnail_url: e.target.value})} placeholder="https://...jpg" />
+            </div>
           </div>
+          <label className="flex items-start gap-3 p-4 rounded-xl border border-gold/30 bg-gold/5">
+            <input type="checkbox" checked={formData.consent_approved} onChange={e => setFormData({...formData, consent_approved: e.target.checked})}
+              className="w-5 h-5 mt-0.5 accent-teal" />
+            <span className="text-sm text-muted">أؤكد أن لدي <strong className="text-text">موافقة مكتوبة من المريض</strong> على تصوير ونشر هذا الفيديو، وهذا إلزامي قبل النشر (قانون 18-11 المتعلق بحماية الأشخاص في مجال الصحة)</span>
+          </label>
           <button type="submit" className="btn-primary w-full py-2">حفظ الفيديو</button>
         </form>
       )}
@@ -166,10 +204,13 @@ export function VideosTab() {
               <div>
                 <h3 className="font-bold text-text truncate">{vid.title_ar}</h3>
                 <p className="text-sm text-muted truncate">{vid.title_fr}</p>
+                {vid.desc_ar && <p className="text-xs text-muted mt-1 line-clamp-2">{vid.desc_ar}</p>}
+                {vid.duration && <p className="text-xs text-gold/70 mt-1">⏱ {vid.duration}</p>}
+                {vid.consent_approved && <p className="text-xs text-teal mt-1">✓ موافقة المريض مصادق عليها</p>}
               </div>
               <div className="flex justify-between items-center mt-auto pt-4 border-t border-surface">
                 <button
-                  onClick={() => handleTogglePublish(vid.id, vid.is_published)}
+                  onClick={() => !vid.consent_approved ? alert('لا يمكن نشر هذا الفيديو: موافقة المريض غير مصادق عليها') : handleTogglePublish(vid.id, vid.is_published)}
                   className={`flex items-center gap-1 px-3 py-1.5 rounded-lg text-sm transition-colors ${vid.is_published ? 'bg-teal/10 text-teal hover:bg-teal/20' : 'bg-surface2 text-muted hover:text-text'}`}
                 >
                   <Check className="w-4 h-4" /> {vid.is_published ? 'منشور' : 'مسودة'}

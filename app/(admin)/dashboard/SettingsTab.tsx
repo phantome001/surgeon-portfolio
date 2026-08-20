@@ -22,12 +22,12 @@ const FIELDS = [
   { key: 'whatsapp_number', label: 'رقم واتساب', icon: Phone, placeholder: '+213555123456', dir: 'ltr' },
   { key: 'clinic_phone', label: 'رقم الهاتف', icon: Phone, placeholder: '+213555123456', dir: 'ltr' },
   { key: 'clinic_name', label: 'اسم العيادة', icon: Building2, placeholder: 'عيادة الجراحة العامة', dir: 'rtl' },
-  { key: 'clinic_email', label: 'البريد الإلكتروني', icon: Mail, placeholder: 'contact@dr-belhaj.dz', dir: 'ltr' },
+  { key: 'clinic_email', label: 'البريد الإلكتروني', icon: Mail, placeholder: 'contact@dr-ghanoush.dz', dir: 'ltr' },
   { key: 'clinic_address', label: 'عنوان العيادة', icon: MapPin, placeholder: 'حيدرة، الجزائر العاصمة', dir: 'rtl' },
 ] as const
 
 const PROFILE_FIELDS = [
-  { key: 'doctor_name', label: 'اسم الطبيب', icon: UserCircle, placeholder: 'د. أمين بلحاج', dir: 'rtl' },
+  { key: 'doctor_name', label: 'اسم الطبيب', icon: UserCircle, placeholder: 'د. غنوش زين الدين', dir: 'rtl' },
   { key: 'doctor_specialty', label: 'التخصص الدقيق', icon: Star, placeholder: 'جراح اختصاصي في أمراض الجهاز الهضمي', dir: 'rtl' },
   { key: 'doctor_description', label: 'النبذة التعريفية (تظهر في الواجهة)', icon: HeartPulse, placeholder: 'خبرة تزيد عن 15 سنة في الجراحة...', dir: 'rtl', isTextarea: true },
 ] as const
