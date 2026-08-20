@@ -49,36 +49,41 @@ export default function ChatPage() {
     }
   }
 
-  // جلب المستخدم عبر supabase client أولاً، وعند التعطل نستخدم REST مباشرة
+  // جلب المستخدم عبر REST مباشر أولاً (سريع وموثوق)، ثم supabase client عند غياب التوكن
   const getUser = useCallback(async () => {
     try {
-      const result = await withTimeout(supabase.auth.getUser())
-      if (result?.data?.user) return result.data.user
-    } catch {
-      // supabase client رمى خطأ -- نكمل إلى REST
-    }
-    // احتياطي: REST مباشر مع توكن الجلسة
-    const token = getSessionToken()
-    if (!token) return null
-    const res = await fetch(
-      'https://bvxqtzqkauonfyxobpih.supabase.co/auth/v1/user',
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          apikey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '',
-        },
+      const token = getSessionToken()
+      if (token) {
+        const controller = new AbortController()
+        const timer = setTimeout(() => controller.abort(), 4000)
+        const res = await fetch(
+          `${process.env.NEXT_PUBLIC_SUPABASE_URL}/auth/v1/user`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              apikey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '',
+            },
+            signal: controller.signal,
+          }
+        )
+        clearTimeout(timer)
+        if (res.ok) return (await res.json()) as { id: string; email?: string }
       }
-    )
-    if (!res.ok) return null
-    return (await res.json()) as { id: string; email?: string }
+      // احتياطي: supabase client مع مهلة قصيرة
+      const result = await withTimeout(supabase.auth.getUser(), 4000)
+      return result?.data?.user || null
+    } catch {
+      return null
+    }
   }, [supabase])
 
   const loadChat = useCallback(async () => {
     try {
       const user = await getUser()
       if (!user) {
-        // غير مسجل: أوقف التحميل ووجّه لصفحة الدخول
+        // إما غير مسجل أو تعذر التحقق -- لا نعلق الصفحة نهائياً
         setLoading(false)
+        if (!getSessionToken()) setUserId(null)
         return
       }
       setUserId(user.id)
