@@ -7,7 +7,7 @@ import type { RealtimeChannel } from '@supabase/supabase-js'
 
 interface Message {
   id: string
-  sender_id: string
+  sender_id: string | null
   content: string
   sent_at: string
 }
@@ -27,9 +27,55 @@ export default function ChatPage() {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
   }
 
+  // مهلة آمنة: أي طلب يعلّق لأكثر من 8 ثوانٍ يُعتبر فشلاً
+  const withTimeout = <T,>(promise: Promise<T>, ms = 8000): Promise<T | null> =>
+    new Promise<T | null>((resolve) => {
+      const timer = setTimeout(() => resolve(null), ms)
+      promise.finally(() => clearTimeout(timer)).then(resolve)
+    })
+
+  // استخراج توكن الجلسة الحالي من الكوكيز (احتياطي إذا علق supabase client)
+  const getSessionToken = (): string | null => {
+    const raw = document.cookie
+      .split(';')
+      .map((c) => c.trim())
+      .find((c) => c.startsWith('sb-bvxqtzqkauonfyxobpih-auth-token='))
+      ?.split('=')[1]
+    if (!raw) return null
+    try {
+      return JSON.parse(decodeURIComponent(atob(raw.replace(/^base64-/, '')))).access_token || null
+    } catch {
+      return null
+    }
+  }
+
+  // جلب المستخدم عبر supabase client أولاً، وعند التعطل نستخدم REST مباشرة
+  const getUser = useCallback(async () => {
+    try {
+      const result = await withTimeout(supabase.auth.getUser())
+      if (result?.data?.user) return result.data.user
+    } catch {
+      // supabase client رمى خطأ -- نكمل إلى REST
+    }
+    // احتياطي: REST مباشر مع توكن الجلسة
+    const token = getSessionToken()
+    if (!token) return null
+    const res = await fetch(
+      'https://bvxqtzqkauonfyxobpih.supabase.co/auth/v1/user',
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          apikey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '',
+        },
+      }
+    )
+    if (!res.ok) return null
+    return (await res.json()) as { id: string; email?: string }
+  }, [supabase])
+
   const loadChat = useCallback(async () => {
     try {
-      const { data: { user } } = await supabase.auth.getUser()
+      const user = await getUser()
       if (!user) {
         // غير مسجل: أوقف التحميل ووجّه لصفحة الدخول
         setLoading(false)
@@ -37,45 +83,57 @@ export default function ChatPage() {
       }
       setUserId(user.id)
 
-    // Check for existing conversation
-    const convRes: any = await supabase
-      .from('conversations')
-      .select('id')
-      .eq('patient_id', user.id)
-      .single()
-
-    let finalConvId = convRes.data?.id
-
-    if (!finalConvId) {
-      // Workaround for some Supabase CLI generated type mismatches where insert requires any cast structurally
-      // We typecast it to unknown then to the expected structure and extract id safely.
-      const res: any = await supabase
-        .from('conversations')
-        .insert([{ patient_id: user.id }] as any)
-        .select('id')
-        .single()
-      
-      finalConvId = res.data?.id
-    }
-
-    if (finalConvId) {
-      setConversationId(finalConvId)
-
-      // Load messages via API (server decrypts)
-      const res = await fetch(`/api/chat?conversationId=${finalConvId}`)
-      if (res.ok) {
-        const data = await res.json()
-        setMessages(data.messages || [])
+      // جلب المحادثة عبر REST (أسرع وأكثر موثوقية من supabase client في الإنتاج)
+      const token = getSessionToken()
+      const sbUrl = 'https://bvxqtzqkauonfyxobpih.supabase.co/rest/v1'
+      const headers: Record<string, string> = {
+        apikey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '',
       }
-    }
+      if (token) headers['Authorization'] = `Bearer ${token}`
 
-    setLoading(false)
+      let finalConvId: string | null = null
+      const convRes = await withTimeout(
+        fetch(`${sbUrl}/conversations?select=id&patient_id=eq.${user.id}`, {
+          headers,
+        })
+      )
+      if (convRes?.ok) {
+        const convs = await convRes.json()
+        finalConvId = convs[0]?.id || null
+      }
+
+      if (!finalConvId) {
+        const insertRes = await withTimeout(
+          fetch(`${sbUrl}/conversations?select=id`, {
+            method: 'POST',
+            headers: { ...headers, 'Content-Type': 'application/json' },
+            body: JSON.stringify({ patient_id: user.id }),
+          })
+        )
+        if (insertRes?.ok) {
+          const created = await insertRes.json()
+          finalConvId = Array.isArray(created) ? created[0]?.id : created?.id || null
+        }
+      }
+
+      if (finalConvId) {
+        setConversationId(finalConvId)
+
+        // Load messages via API (server decrypts)
+        const res = await fetch(`/api/chat?conversationId=${finalConvId}`)
+        if (res.ok) {
+          const data = await res.json()
+          setMessages(data.messages || [])
+        }
+      }
+
+      setLoading(false)
     } catch (err) {
       console.error('[chat] فشل تحميل المحادثة:', err)
       setLoading(false)
       setError('حدث خطأ أثناء تحميل المحادثة. حاول مرة أخرى.')
     }
-  }, [supabase])
+  }, [getUser])
 
   useEffect(() => {
     loadChat()

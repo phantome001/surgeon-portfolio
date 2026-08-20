@@ -1,7 +1,34 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { createClient, createAdminClient } from '@/lib/supabase/server'
 import { messageSchema } from '@/lib/validations/chat'
 import { encrypt } from '@/lib/encryption'
+
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY
+const AI_MODEL = 'gemini-2.5-flash'
+const GEMINI_SYSTEM_PROMPT =
+  'أنت مساعد جراح محترف وخبير. وظيفتك هي الرد على تساؤلات المرضى وتوجيههم بلطف ومهنية باللغة العربية. ' +
+  'إذا سأل المريض عن أعراض مقلقة، وجهه فوراً لحجز موعد في العيادة للفحص البدني. ' +
+  'لا تصف أدوية قوية، بل قدم نصائح رعاية أولية فقط. أنت تمثل الدكتور وتنسق مع المرضى.'
+
+async function generateAiReply(content: string): Promise<string> {
+  if (!GEMINI_API_KEY) return ''
+  try {
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/${AI_MODEL}:generateContent?key=${GEMINI_API_KEY}`
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        system_instruction: { parts: [{ text: GEMINI_SYSTEM_PROMPT }] },
+        contents: [{ role: 'user', parts: [{ text: content }] }],
+        generationConfig: { temperature: 0.7 },
+      }),
+    })
+    const aiData = await response.json()
+    return aiData.candidates?.[0]?.content?.parts?.[0]?.text || ''
+  } catch {
+    return ''
+  }
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -33,6 +60,28 @@ export async function POST(request: NextRequest) {
       .single()
 
     if (error) throw error
+
+    // توليد رد الذكاء الاصطناعي التلقائي
+    const { data: conv } = await supabase
+      .from('conversations')
+      .select('ai_enabled')
+      .eq('id', conversationId)
+      .single()
+
+    const aiEnabled = (conv as any)?.ai_enabled !== false
+    if (aiEnabled) {
+      const aiText = await generateAiReply(content)
+      if (aiText) {
+        const admin = createAdminClient()
+        await admin
+          .from('messages')
+          .insert({
+            conversation_id: conversationId,
+            sender_id: null,
+            content_encrypted: encrypt(aiText),
+          } as any)
+      }
+    }
 
     return NextResponse.json(message, { status: 201 })
   } catch (error) {
