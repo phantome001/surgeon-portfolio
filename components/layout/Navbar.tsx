@@ -94,7 +94,7 @@ export function Navbar({ initialUser }: NavbarProps) {
                   <div className="w-px h-8 bg-white/10 mx-1" />
                   <div className="flex items-center gap-2">
                     <Link 
-                      href="/login-admin" 
+                      href="/admin" 
                       className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold transition-all shadow-sm ${
                         pathname === '/dashboard' 
                           ? 'bg-gold text-navy-900' 
@@ -212,7 +212,7 @@ export function Navbar({ initialUser }: NavbarProps) {
                 </div>
                 
                 <Link 
-                  href="/login-admin" 
+                  href="/admin" 
                   onClick={() => setOpen(false)}
                   className={`flex items-center gap-4 px-4 py-3.5 rounded-xl text-sm font-semibold transition-all ${
                     pathname === '/dashboard'
