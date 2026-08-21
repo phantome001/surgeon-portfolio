@@ -1,10 +1,9 @@
 import type { Metadata } from 'next'
 import { IBM_Plex_Sans_Arabic, Playfair_Display } from 'next/font/google'
 import './globals.css'
-import { WhatsAppButton } from '@/components/WhatsAppButton'
-import { AIAssistant } from '@/components/ai/AIAssistant'
 import { PWARegister } from '@/components/PWARegister'
 import { Toaster } from 'react-hot-toast'
+import ClientLayout from '@/components/layout/ClientLayout'
 
 const ibmPlexSansArabic = IBM_Plex_Sans_Arabic({ 
   weight: ['300', '400', '500', '600', '700'],
@@ -71,15 +70,14 @@ export default function RootLayout({
         <link rel="apple-touch-icon" href="/icons/icon-192.png" />
       </head>
       <body className={`${ibmPlexSansArabic.className} ${ibmPlexSansArabic.variable} ${playfairDisplay.variable} antialiased`}>
-        <div className="min-h-screen flex flex-col">
-          {children}
-        </div>
-        <WhatsAppButton />
-        <AIAssistant />
+        <ClientLayout>
+          <div className="min-h-screen flex flex-col">
+            {children}
+          </div>
+        </ClientLayout>
         <PWARegister />
         <Toaster position="bottom-left" reverseOrder={false} />
       </body>
     </html>
   )
 }
-
