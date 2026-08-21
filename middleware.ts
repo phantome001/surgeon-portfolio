@@ -25,12 +25,12 @@ export async function middleware(request: NextRequest) {
 
   const { data: { user } } = await supabase.auth.getUser()
 
-  // CVE-09 FIX: Protect /dashboard routes - require authentication
+  // Protect /dashboard routes - require authentication
   const isDashboardRoute = request.nextUrl.pathname.startsWith('/dashboard')
   if (isDashboardRoute && !user) {
-    const loginUrl = new URL('/login', request.url)
-    loginUrl.searchParams.set('redirect', request.nextUrl.pathname)
-    return NextResponse.redirect(loginUrl)
+    // If someone tries to access dashboard, send them to the private admin portal
+    const adminLoginUrl = new URL('/admin-portal', request.url)
+    return NextResponse.redirect(adminLoginUrl)
   }
 
   return response

@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { getSupabaseClient } from '@/lib/supabase/client'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { LogIn, Mail, Lock, Eye, EyeOff } from 'lucide-react'
-
+import { toast } from 'react-hot-toast'
 import { Suspense } from 'react'
 
 function LoginForm() {
@@ -41,8 +41,22 @@ function LoginForm() {
       return
     }
 
-    // Force redirect to dashboard for now to break the loop
-    const targetUrl = successUrl || '/dashboard'
+    // Check user role before redirecting
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('role')
+      .eq('id', authUser.id)
+      .single()
+
+    if (profile?.role === 'doctor' || profile?.role === 'admin') {
+      // If a doctor tries to login through patient portal, redirect to admin portal
+      toast.error('هذا المدخل للمرضى فقط. يرجى استخدام بوابة الطبيب.')
+      await supabase.auth.signOut()
+      router.push('/admin-portal')
+      return
+    }
+
+    const targetUrl = successUrl || '/chat'
     
     router.push(targetUrl)
     router.refresh()
