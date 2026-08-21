@@ -26,10 +26,10 @@ export async function middleware(request: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser()
 
   // Protect /dashboard routes - require authentication
-  const isDashboardRoute = request.nextUrl.pathname.startsWith('/dashboard') && !request.nextUrl.pathname.startsWith('/login-admin')
+  const isDashboardRoute = request.nextUrl.pathname.startsWith('/dashboard') && !request.nextUrl.pathname.startsWith('/admin-login')
   if (isDashboardRoute && !user) {
     // If someone tries to access dashboard, send them to the private admin portal
-    const adminLoginUrl = new URL('/login-admin', request.url)
+    const adminLoginUrl = new URL('/admin-login', request.url)
     return NextResponse.redirect(adminLoginUrl)
   }
 
