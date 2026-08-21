@@ -4,6 +4,7 @@ import { useState, useEffect, useRef, useCallback } from 'react'
 import { getSupabaseClient } from '@/lib/supabase/client'
 import { Send, MessageCircle } from 'lucide-react'
 import type { RealtimeChannel } from '@supabase/supabase-js'
+import toast from 'react-hot-toast'
 
 interface Message {
   id: string
@@ -206,6 +207,8 @@ export default function ChatPage() {
       setNewMessage('')
       // إعادة تحميل الرسائل لعرض رسالة المستخدم ورد الذكاء الاصطناعي التلقائي
       setTimeout(() => loadChat(), 500)
+    } else {
+      toast.error('تعذر إرسال الرسالة. حاول مرة أخرى.')
     }
     setSending(false)
   }

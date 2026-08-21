@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { getSupabaseClient } from '@/lib/supabase/client'
 import { Clock, Check, AlertCircle, ChevronRight, ChevronLeft, User, Phone as PhoneIcon, FileText } from 'lucide-react'
+import toast from 'react-hot-toast'
 
 const TIME_SLOTS = ['09:00', '10:00', '11:00', '14:00', '15:00', '16:00']
 
@@ -77,10 +78,13 @@ export default function AppointmentsPage() {
     })
 
     if (res.ok) {
+      toast.success('تم إرسال طلب الحجز بنجاح')
       setStep('success')
     } else {
       const data = await res.json()
-      setError(data.error || 'حدث خطأ')
+      const errorMsg = data.error || 'حدث خطأ أثناء الحجز'
+      setError(errorMsg)
+      toast.error(errorMsg)
     }
     setLoading(false)
   }

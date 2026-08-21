@@ -1,7 +1,8 @@
 ﻿'use client'
 
 import { useState } from 'react'
-import { CalendarDays, Check, X, Plus } from 'lucide-react'
+import { CalendarDays, Check, X, Plus, Download } from 'lucide-react'
+import * as XLSX from 'xlsx'
 
 interface Appointment {
   id: string
@@ -49,6 +50,22 @@ export function AppointmentsTab({
     }
   }
 
+  const exportToExcel = () => {
+    const dataToExport = appointments.map(apt => ({
+      'الاسم الكامل': apt.full_name,
+      'رقم الهاتف': apt.phone,
+      'التاريخ': apt.date,
+      'الوقت': apt.time_slot,
+      'سبب الزيارة': apt.reason,
+      'الحالة': apt.status === 'confirmed' ? 'مؤكد' : apt.status === 'pending' ? 'قيد الانتظار' : apt.status === 'completed' ? 'مكتمل' : 'ملغي'
+    }))
+
+    const ws = XLSX.utils.json_to_sheet(dataToExport)
+    const wb = XLSX.utils.book_new()
+    XLSX.utils.book_append_sheet(wb, ws, 'المواعيد')
+    XLSX.writeFile(wb, `مواعيد_العيادة_${new Date().toISOString().split('T')[0]}.xlsx`)
+  }
+
   if (loading) {
      return (
         <div className="flex justify-center py-20">
@@ -59,15 +76,25 @@ export function AppointmentsTab({
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
+      <div className="flex justify-between items-center flex-wrap gap-4">
         <h2 className="text-xl font-bold font-display text-text">إدارة المواعيد</h2>
-        <button 
-          onClick={() => setIsAdding(!isAdding)}
-          className="btn-primary py-2 px-4 flex items-center gap-2"
-        >
-          {isAdding ? <X className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
-          {isAdding ? 'إلغاء' : 'إضافة موعد'}
-        </button>
+        <div className="flex gap-2">
+          <button 
+            onClick={exportToExcel}
+            className="btn-secondary py-2 px-4 flex items-center gap-2 text-sm"
+            title="تصدير إلى Excel"
+          >
+            <Download className="w-4 h-4" />
+            تصدير Excel
+          </button>
+          <button 
+            onClick={() => setIsAdding(!isAdding)}
+            className="btn-primary py-2 px-4 flex items-center gap-2 text-sm"
+          >
+            {isAdding ? <X className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
+            {isAdding ? 'إلغاء' : 'إضافة موعد'}
+          </button>
+        </div>
       </div>
 
       {isAdding && (

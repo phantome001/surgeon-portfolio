@@ -220,7 +220,8 @@ export default async function HomePage() {
           <h2 className="text-3xl font-bold font-display mb-4 gold-gradient">هل تحتاج استشارة طبية؟</h2>
           <p className="text-muted mb-8">احجز موعدك الآن أو تواصل معنا مباشرة عبر المحادثة</p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="/register" className="btn-primary">إنشاء حساب مريض</Link>
+            <Link href="/patient-guides" className="btn-primary">📖 دليل المريض</Link>
+            <Link href="/register" className="btn-secondary">إنشاء حساب مريض</Link>
             <Link href="/contact" className="btn-secondary">اتصل بالعيادة</Link>
           </div>
         </div>

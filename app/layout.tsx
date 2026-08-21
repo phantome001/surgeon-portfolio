@@ -4,6 +4,7 @@ import './globals.css'
 import { WhatsAppButton } from '@/components/WhatsAppButton'
 import { AIAssistant } from '@/components/ai/AIAssistant'
 import { PWARegister } from '@/components/PWARegister'
+import { Toaster } from 'react-hot-toast'
 
 const ibmPlexSansArabic = IBM_Plex_Sans_Arabic({ 
   weight: ['300', '400', '500', '600', '700'],
@@ -18,17 +19,41 @@ const playfairDisplay = Playfair_Display({
 })
 
 export const metadata: Metadata = {
-  title: 'د. غنوش زين الدين — جراح اختصاصي',
-  description: 'المرافق الرقمي وخبير الجراحة المتطور للدكتور غنوش زين الدين — جراحة السمنة والمنظار.',
-  keywords: ['جراح', 'أمراض الجهاز الهضمي', 'عمليات بالمنظار', 'حجز موعد', 'الجزائر'],
+  title: 'د. غنوش زين الدين — جراح اختصاصي في أمراض الجهاز الهضمي والسمنة',
+  description: 'الموقع الرسمي للدكتور غنوش زين الدين بجاية الجزائر. متخصص في جراحة السمنة، المنظار، والجراحة العامة. احجز موعدك الآن واستشر خبير الجراحة.',
+  keywords: [
+    'دكتور غنوش زين الدين', 
+    'جراح في الجزائر', 
+    'جراحة السمنة الجزائر', 
+    'تكميم المعدة الجزائر', 
+    'جراحة المنظار بجاية', 
+    'أفضل جراح جهاز هضمي الجزائر',
+    'المرارة بالمنظار',
+    'الفتق بالمنظار',
+    'حجز موعد طبيب جراح'
+  ],
   authors: [{ name: 'د. غنوش زين الدين' }],
   openGraph: {
-    title: 'د. غنوش زين الدين — جراح اختصاصي في أمراض الجهاز الهضمي',
-    description: 'حجز المواعيد والاستشارات الطبية عبر الإنترنت',
+    title: 'د. غنوش زين الدين — جراح اختصاصي في أمراض الجهاز الهضمي والسمنة',
+    description: 'جراحة السمنة والمنظار بأحدث التقنيات العالمية في الجزائر.',
     type: 'website',
     locale: 'ar_DZ',
+    siteName: 'د. غنوش زين الدين',
   },
-  robots: { index: true, follow: true },
+  robots: { 
+    index: true, 
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
+  verification: {
+    google: 'google-site-verification-placeholder',
+  },
 }
 
 export default function RootLayout({
@@ -52,6 +77,7 @@ export default function RootLayout({
         <WhatsAppButton />
         <AIAssistant />
         <PWARegister />
+        <Toaster position="bottom-left" reverseOrder={false} />
       </body>
     </html>
   )

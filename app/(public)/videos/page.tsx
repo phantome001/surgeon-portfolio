@@ -142,8 +142,14 @@ export default function VideosPage() {
         )}
 
         {loading ? (
-          <div className="flex items-center justify-center py-20">
-            <div className="w-8 h-8 border-2 border-gold border-t-transparent rounded-full animate-spin" />
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+            {[1, 2, 3, 4, 5, 6].map((i) => (
+              <div key={i} className="card-glow animate-pulse">
+                <div className="w-12 h-12 bg-surface2 rounded-xl mb-3" />
+                <div className="h-5 bg-surface2 rounded w-2/3 mb-2" />
+                <div className="h-3 bg-surface2 rounded w-1/2" />
+              </div>
+            ))}
           </div>
         ) : !selectedCategory ? (
           /* Category Grid */
@@ -165,7 +171,16 @@ export default function VideosPage() {
         ) : (
           /* Video List */
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {videos.map((video) => (
+            {loading ? (
+              [1, 2, 3].map((i) => (
+                <div key={i} className="card-glow animate-pulse">
+                  <div className="aspect-video bg-surface2 rounded-xl mb-4" />
+                  <div className="h-5 bg-surface2 rounded w-3/4 mb-2" />
+                  <div className="h-3 bg-surface2 rounded w-full mb-1" />
+                  <div className="h-3 bg-surface2 rounded w-2/3" />
+                </div>
+              ))
+            ) : videos.map((video) => (
               <button
                 key={video.id}
                 onClick={() => handleWatchVideo(video)}
