@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { getSupabaseClient } from '@/lib/supabase/client'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { LogIn, Mail, Lock, Eye, EyeOff } from 'lucide-react'
+import { LogIn, Mail, Lock, Eye, EyeOff, ShieldCheck } from 'lucide-react'
 import { toast } from 'react-hot-toast'
 import { Suspense } from 'react'
 
@@ -17,6 +17,7 @@ function LoginForm() {
   const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  const [isAdminMode, setIsAdminMode] = useState(false)
   const supabase = getSupabaseClient()
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -41,22 +42,30 @@ function LoginForm() {
       return
     }
 
-    // Check user role before redirecting
+    // Check user role
     const { data: profile } = await supabase
       .from('profiles')
       .select('role')
       .eq('id', authUser.id)
       .single()
 
-    if (profile?.role === 'doctor' || profile?.role === 'admin') {
-      // If a doctor tries to login through patient portal, redirect to admin portal
-      toast.error('هذا المدخل للمرضى فقط. يرجى استخدام بوابة الطبيب.')
+    const isDoctor = profile?.role === 'doctor' || profile?.role === 'admin'
+
+    if (isAdminMode && !isDoctor) {
+      toast.error('عذراً، هذا الحساب ليس له صلاحيات دخول الطبيب.')
       await supabase.auth.signOut()
-      router.push('/admin-portal')
+      setLoading(false)
       return
     }
 
-    const targetUrl = successUrl || '/chat'
+    if (!isAdminMode && isDoctor) {
+      toast.success('مرحباً دكتور! تم توجيهك للوحة التحكم.')
+      router.push('/dashboard')
+      router.refresh()
+      return
+    }
+
+    const targetUrl = isDoctor ? '/dashboard' : (successUrl || '/chat')
     
     router.push(targetUrl)
     router.refresh()
@@ -67,11 +76,15 @@ function LoginForm() {
       <div className="w-full max-w-md">
         <div className="card border-gold/10">
           <div className="text-center mb-8">
-            <div className="w-16 h-16 rounded-2xl bg-gold/10 flex items-center justify-center mx-auto mb-4">
-              <LogIn className="w-8 h-8 text-gold" />
+            <div className={`w-16 h-16 rounded-2xl ${isAdminMode ? 'bg-red-500/10' : 'bg-gold/10'} flex items-center justify-center mx-auto mb-4 transition-colors duration-300`}>
+              {isAdminMode ? <ShieldCheck className="w-8 h-8 text-red-500" /> : <LogIn className="w-8 h-8 text-gold" />}
             </div>
-            <h1 className="text-2xl font-bold font-display gold-gradient">تسجيل الدخول</h1>
-            <p className="text-muted mt-2 text-sm">أدخل بياناتك للوصول إلى حسابك</p>
+            <h1 className="text-2xl font-bold font-display gold-gradient">
+              {isAdminMode ? 'بوابة دخول الطبيب' : 'تسجيل الدخول'}
+            </h1>
+            <p className="text-muted mt-2 text-sm">
+              {isAdminMode ? 'يرجى إدخال بيانات المسؤول للوصول للوحة التحكم' : 'أدخل بياناتك للوصول إلى حسابك'}
+            </p>
           </div>
 
           <form onSubmit={handleLogin} className="space-y-5">
@@ -123,10 +136,20 @@ function LoginForm() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full btn-primary disabled:opacity-50"
+              className={`w-full btn-primary ${isAdminMode ? 'bg-red-600 hover:bg-red-700' : ''} disabled:opacity-50 transition-colors duration-300`}
             >
-              {loading ? 'جارٍ الدخول...' : 'تسجيل الدخول'}
+              {loading ? 'جارٍ التحقق...' : (isAdminMode ? 'دخول المسؤول' : 'تسجيل الدخول')}
             </button>
+
+            <div className="pt-4 border-t border-gold/5 text-center">
+              <button
+                type="button"
+                onClick={() => setIsAdminMode(!isAdminMode)}
+                className="text-sm text-gold hover:underline"
+              >
+                {isAdminMode ? 'العودة لتسجيل دخول المرضى' : 'هل أنت الطبيب؟ ادخل من هنا'}
+              </button>
+            </div>
           </form>
         </div>
       </div>
