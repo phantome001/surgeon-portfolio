@@ -29,7 +29,7 @@ export async function middleware(request: NextRequest) {
   const isDashboardRoute = request.nextUrl.pathname.startsWith('/dashboard')
   if (isDashboardRoute && !user) {
     // If someone tries to access dashboard, send them to the private admin portal
-    const adminLoginUrl = new URL('/admin-portal', request.url)
+    const adminLoginUrl = new URL('/admin-access', request.url)
     return NextResponse.redirect(adminLoginUrl)
   }
 
