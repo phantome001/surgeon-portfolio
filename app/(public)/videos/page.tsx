@@ -21,6 +21,7 @@ interface Video {
   desc_ar: string
   desc_fr: string
   embed_url: string
+  thumbnail_url?: string
   duration: string
   views: number
 }
@@ -171,7 +172,29 @@ export default function VideosPage() {
                 className="card-glow text-start group overflow-hidden"
               >
                 <div className="aspect-video bg-navy-700 rounded-xl mb-4 flex items-center justify-center relative overflow-hidden">
-                  {/* Removed thumbnail as requested */}
+                  {/* Auto-generate YouTube thumbnail if missing */}
+                  {(() => {
+                    let thumb = video.thumbnail_url;
+                    if (!thumb && video.embed_url.includes('youtube.com/embed/')) {
+                      const videoId = video.embed_url.split('/').pop();
+                      thumb = `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`;
+                    }
+                    return thumb ? (
+                      <img 
+                        src={thumb} 
+                        alt={video.title_ar}
+                        className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                        onError={(e) => {
+                          // Fallback to hqdefault if maxres doesn't exist
+                          const target = e.target as HTMLImageElement;
+                          if (target.src.includes('maxresdefault')) {
+                            target.src = target.src.replace('maxresdefault', 'hqdefault');
+                          }
+                        }}
+                      />
+                    ) : null;
+                  })()}
+                  <div className="absolute inset-0 bg-black/20 group-hover:bg-black/40 transition-colors" />
                   <div className="w-14 h-14 rounded-full bg-black/50 backdrop-blur-sm flex items-center justify-center group-hover:bg-gold/80 transition-colors z-10">
                     <Play className="w-7 h-7 text-white fill-white" />
                   </div>

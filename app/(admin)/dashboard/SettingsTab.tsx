@@ -10,6 +10,7 @@ interface SiteSettings {
   clinic_address: string
   clinic_email: string
   clinic_phone: string
+  google_maps_embed?: string
   doctor_name?: string
   doctor_specialty?: string
   doctor_description?: string
@@ -24,6 +25,7 @@ const FIELDS = [
   { key: 'clinic_name', label: 'اسم العيادة', icon: Building2, placeholder: 'عيادة الجراحة العامة', dir: 'rtl' },
   { key: 'clinic_email', label: 'البريد الإلكتروني', icon: Mail, placeholder: 'contact@dr-ghanoush.dz', dir: 'ltr' },
   { key: 'clinic_address', label: 'عنوان العيادة', icon: MapPin, placeholder: 'حيدرة، الجزائر العاصمة', dir: 'rtl' },
+  { key: 'google_maps_embed', label: 'رابط خريطة جوجل (Embed)', icon: MapPin, placeholder: 'https://www.google.com/maps/embed?...', dir: 'ltr' },
 ] as const
 
 const PROFILE_FIELDS = [
@@ -91,6 +93,7 @@ export function SettingsTab() {
     stat_experience: '',
     stat_operations: '',
     stat_patients: '',
+    google_maps_embed: '',
   })
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState<string | null>(null)

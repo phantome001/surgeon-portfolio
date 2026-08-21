@@ -13,6 +13,7 @@ const bodyParts = [
     x: 50,
     y: 15,
     description: 'استئصال كُلّي أو جزئي للغدة الدرقية جراحياً مع الحفاظ الدقيق على الأحبال الصوتية باستخدام أحدث التقنيات، لضمان أعلى نسبة نجاح وأفضل نتيجة تجميلية للرقبة.',
+    advice: 'يُنصح المريض بالراحة التامة لمدة 48 ساعة بعد العملية وتجنب المجهود العضلي الشديد للرقبة لمدة أسبوعين.'
   },
   {
     id: 'gallbladder',
@@ -20,6 +21,7 @@ const bodyParts = [
     x: 35, // Patient's right side (viewer's left)
     y: 40,
     description: 'جراحة متطورة لاستئصال الحصوات والمرارة عبر شقوق دقيقة جداً لا تتجاوز 1 سم (بالمنظار الكاميرا)، مما يقلل الألم ويسرّع العودة للحياة الطبيعية.',
+    advice: 'يجب اتباع حمية قليلة الدهون لمدة شهر بعد العملية لمساعدة الجهاز الهضمي على التكيف مع غياب المرارة.'
   },
   {
     id: 'bariatric',
@@ -27,6 +29,7 @@ const bodyParts = [
     x: 50,
     y: 50,
     description: 'علاج السمنة المفرطة جراحياً بالمنظار (مثل تكميم المعدة Manga / Sleeve أو تحويل المسار)، لمساعدة المريض على إنقاص وزنه والتخلص من أمراض السكر والضغط.',
+    advice: 'الالتزام بنظام السوائل في الأسبوعين الأولين ضروري جداً لضمان التئام جدار المعدة الجديد بأمان.'
   },
   {
     id: 'hernia',
@@ -34,6 +37,7 @@ const bodyParts = [
     x: 65, // Groin or lower abdomen
     y: 65,
     description: 'إصلاح دقيق لجميع أنواع الفتق (السري، الإربي، أو ما بعد الجراحة الأصيلة) باستخدام أحدث الشبكات الطبية لضمان عدم رجوع الفتق، سواء بالجراحة المفتوحة أو بالمنظار.',
+    advice: 'تجنب حمل الأوزان الثقيلة (أكثر من 5 كغ) لمدة 6 أسابيع على الأقل لضمان ثبات الشبكة الطبية والتحام الأنسجة.'
   },
   {
     id: 'proctology',
@@ -41,6 +45,7 @@ const bodyParts = [
     x: 50,
     y: 85,
     description: 'تشخيص وعلاج دقيق لجميع أمراض منطقة الشرج (البواسير، الناصور، الشق الشرجي) بأقل تدخل جراحي ممكن لتفادي الآلام وتسريع الاستشفاء البعدي.',
+    advice: 'الإكثار من الألياف وشرب الماء بانتظام يمنع الإمساك، وهو العامل الأهم لنجاح العملية وعدم عودة البواسير.'
   }
 ]
 
@@ -111,9 +116,15 @@ export function InteractiveAnatomy() {
             <h3 className="text-2xl font-bold font-display text-gold mb-4 relative z-10">
               {activeInfo?.label}
             </h3>
-            <p className="text-muted text-base leading-relaxed relative z-10">
+            <p className="text-muted text-base leading-relaxed relative z-10 mb-4">
               {activeInfo?.description}
             </p>
+            {activeInfo?.advice && (
+              <div className="bg-gold/10 border-r-4 border-gold p-4 rounded-l-xl relative z-10 animate-slide-in">
+                <p className="text-sm font-bold text-gold mb-1">💡 نصيحة الدكتور للمريض:</p>
+                <p className="text-sm text-text italic">{activeInfo.advice}</p>
+              </div>
+            )}
           </div>
         ) : (
           <div className="text-muted italic">الرجاء اختيار منطقة من الجسم لمعرفة المزيد عن الجراحات المختصة.</div>

@@ -198,8 +198,22 @@ export function VideosTab() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {videos.map(vid => (
             <div key={vid.id} className="card flex flex-col gap-4">
-              <div className="aspect-video bg-navy-900 rounded-lg overflow-hidden">
-                <iframe src={vid.embed_url} className="w-full h-full" allowFullScreen></iframe>
+              <div className="aspect-video bg-navy-900 rounded-lg overflow-hidden relative group">
+                {(() => {
+                  let thumb = vid.thumbnail_url;
+                  if (!thumb && vid.embed_url.includes('youtube.com/embed/')) {
+                    const videoId = vid.embed_url.split('/').pop();
+                    thumb = `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
+                  }
+                  return thumb ? (
+                    <img src={thumb} alt="" className="w-full h-full object-cover" />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center text-muted text-xs">لا توجد صورة مصغرة</div>
+                  );
+                })()}
+                <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <Film className="w-8 h-8 text-white" />
+                </div>
               </div>
               <div>
                 <h3 className="font-bold text-text truncate">{vid.title_ar}</h3>

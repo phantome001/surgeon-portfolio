@@ -1,13 +1,15 @@
 ﻿'use client'
 
 import { useState, useEffect } from 'react'
-import { Users, Film, CalendarDays, Activity, Video, Clock } from 'lucide-react'
+import { Users, Film, CalendarDays, Activity, Video, Clock, MessageCircle, Mail } from 'lucide-react'
 import { getSupabaseClient } from '@/lib/supabase/client'
 
 interface StatsData {
   totalPatients: number
   totalVideos: number
   totalViews: number
+  totalMessages: number
+  totalConversations: number
   appointments: {
     total: number
     pending: number
@@ -16,7 +18,7 @@ interface StatsData {
     cancelled: number
   }
   categories: { id: string; name: string; count: number }[]
-  timeline: { id: string; text: string; subtext: string; date: Date; type: 'patient' | 'appointment' | 'video' }[]
+  timeline: { id: string; text: string; subtext: string; date: Date; type: 'patient' | 'appointment' | 'video' | 'message' }[]
 }
 
 export function StatsTab() {
@@ -49,7 +51,18 @@ export function StatsTab() {
         .from('video_categories') as any)
         .select('id, name_ar')
 
+      // Fetch message counts
+      const { data: messages } = await (supabase
+        .from('messages') as any)
+        .select('id, created_at')
+
+      const { data: conversations } = await (supabase
+        .from('conversations') as any)
+        .select('id')
+
       const pts: any[] = patients || []
+      const msgs: any[] = messages || []
+      const convs: any[] = conversations || []
       const apts: any[] = appointments || []
       const vids: any[] = videos || []
       const cats: any[] = categories || []
@@ -58,6 +71,8 @@ export function StatsTab() {
       const totalPatients = pts.length
       const totalVideos = vids.length
       const totalViews = vids.reduce((acc, v) => acc + (v.views || 0), 0)
+      const totalMessages = msgs.length
+      const totalConversations = convs.length
 
       // 2. Appointment Distribution
       const aptStats = {
@@ -101,6 +116,14 @@ export function StatsTab() {
         type: 'video'
       }))
 
+      msgs.slice(0, 5).forEach(m => timeline.push({
+        id: `m-${m.id}`,
+        text: 'رسالة جديدة',
+        subtext: 'استفسار من مريض',
+        date: new Date(m.created_at),
+        type: 'message'
+      }))
+
       timeline.sort((a, b) => b.date.getTime() - a.date.getTime())
       timeline = timeline.slice(0, 10)
 
@@ -108,6 +131,8 @@ export function StatsTab() {
         totalPatients,
         totalVideos,
         totalViews,
+        totalMessages,
+        totalConversations,
         appointments: aptStats,
         categories: catStats,
         timeline,
@@ -186,6 +211,21 @@ export function StatsTab() {
             </div>
             <div className="bg-surface2 p-3 rounded-xl border border-surface shadow-inner">
               <Video className="w-8 h-8 text-blue-400" />
+            </div>
+          </div>
+        </div>
+
+        <div className="card relative overflow-hidden group">
+          <div className="absolute -right-6 -top-6 text-navy-800 opacity-20 transform group-hover:scale-110 transition-transform duration-500">
+            <MessageCircle className="w-32 h-32" />
+          </div>
+          <div className="relative z-10 flex items-center justify-between">
+            <div>
+              <p className="text-sm text-muted mb-1 font-medium">إجمالي المحادثات</p>
+              <h3 className="text-4xl font-bold text-text">{data.totalConversations}</h3>
+            </div>
+            <div className="bg-surface2 p-3 rounded-xl border border-surface shadow-inner">
+              <MessageCircle className="w-8 h-8 text-purple-400" />
             </div>
           </div>
         </div>
@@ -274,8 +314,14 @@ export function StatsTab() {
                  data.timeline.map((item) => (
                   <div key={item.id} className="relative flex items-start gap-4 group">
                     <div className={`flex items-center justify-center w-10 h-10 rounded-full border-4 border-navy-900 shrink-0 shadow relative z-10
-                      ${item.type === 'appointment' ? 'bg-gold/20 text-gold' : item.type === 'patient' ? 'bg-teal/20 text-teal' : 'bg-blue-400/20 text-blue-400'}`}>
-                      {item.type === 'appointment' ? <CalendarDays className="w-4 h-4" /> : item.type === 'patient' ? <Users className="w-4 h-4" /> : <Film className="w-4 h-4" />}
+                      ${item.type === 'appointment' ? 'bg-gold/20 text-gold' : 
+                        item.type === 'patient' ? 'bg-teal/20 text-teal' : 
+                        item.type === 'message' ? 'bg-purple-400/20 text-purple-400' :
+                        'bg-blue-400/20 text-blue-400'}`}>
+                      {item.type === 'appointment' ? <CalendarDays className="w-4 h-4" /> : 
+                       item.type === 'patient' ? <Users className="w-4 h-4" /> : 
+                       item.type === 'message' ? <Mail className="w-4 h-4" /> :
+                       <Film className="w-4 h-4" />}
                     </div>
                     <div className="flex-1 card bg-surface/50 p-3 rounded-xl border border-surface group-hover:bg-surface transition-colors">
                       <time className="mb-1 text-xs font-semibold text-gold/80 flex items-center gap-1">
